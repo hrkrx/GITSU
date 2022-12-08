@@ -1,21 +1,25 @@
 from logging import getLogger, StreamHandler
+import subprocess
+import threading
+import shutil
+import time
+import os
+try: import kivy
+except: subprocess.run(["pip", "install", "kivy"])
 from kivy.uix.gridlayout import GridLayout
-from waifu2x_vulkan import waifu2x_vulkan
 from kivy.uix.spinner import Spinner
 from kivy.clock import mainthread
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 from kivy.app import App
+try: import waifu2x_vulkan
+except: subprocess.run(["pip", "install", "waifu2x-vulkan"])
+from waifu2x_vulkan import waifu2x_vulkan
 from io import StringIO
 from unpacker import *
 from upscaler import *
 from options import *
-import subprocess
 from dds import *
-import threading
-import shutil
-import time
-import os
 
 #########################
 #       Constants       #

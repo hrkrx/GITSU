@@ -1,3 +1,6 @@
+import subprocess
+try: import wand
+except: subprocess.run(["pip", "install", "wand"])
 from wand import image
 
 def dds_to_png(dds_file, png_file):

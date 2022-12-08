@@ -1,8 +1,15 @@
 import os
 import time
 import argparse
+import subprocess
+try: import PIL
+except: subprocess.run(["pip", "install", "pillow"])
 from PIL import Image
+try: import tensorflow
+except: subprocess.run(["pip", "install", "tensorflow"])
 import tensorflow as tf
+try: import tensorflow_hub
+except: subprocess.run(["pip", "install", "tensorflow_hub"])
 import tensorflow_hub as hub
 
 #####################
