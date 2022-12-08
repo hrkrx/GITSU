@@ -1,0 +1,169 @@
+#:kivy 2.1.0
+
+<SettingsPopup>:
+    title: 'Settings'
+    size_hint: 0.5, 0.7
+    auto_dismiss: False
+    GridLayout:
+        cols: 1
+        rows: 6
+        GridLayout:
+            cols: 1
+            rows: 2
+            size_hint_y: None
+            height: 80
+            Label:
+                text: 'Upscale method'
+            GridLayout:
+                cols: 2
+                rows: 1
+                GridLayout:
+                    cols: 2
+                    rows: 1
+                    Label:
+                        text: 'waifu2x_vulkan'
+                    CheckBox:
+                        id: waifu_vulkan_checkbox
+                        text: 'waifu2x_vulkan'
+                        on_active: root.set_upscale_method('waifu2x_vulkan')
+                        group: 'upscale_method'
+                GridLayout:
+                    cols: 2
+                    rows: 1
+                    Label:
+                        text: 'ESRGAN_4x'
+                    CheckBox:
+                        id: esrgan_checkbox
+                        text: 'ESRGAN_4x'
+                        on_active: root.set_upscale_method('ESRGAN_4x')
+                        group: 'upscale_method'
+        StackLayout:
+            id: specific_model_settings
+        GridLayout:
+            cols: 3
+            rows: 1
+            size_hint_y: None
+            height: 40
+            GridLayout:
+                cols: 2
+                rows: 1
+                CheckBox:
+                    id: map_dat_checkbox
+                    on_release: root.set_map_dat()
+                Label:
+                    text: 'Maps'
+            GridLayout:
+                cols: 2
+                rows: 1
+                CheckBox:
+                    id: model_dat_checkbox
+                    on_release: root.set_model_dat()
+                Label:
+                    text: 'Models'
+            GridLayout:
+                cols: 2
+                rows: 1
+                CheckBox:
+                    id: weapon_dat_checkbox
+                    on_release: root.set_weapon_dat()
+                Label:
+                    text: 'Weapons'
+            
+            
+            
+            
+        GridLayout:
+            rows: 3
+            cols: 1
+            Label:
+                text: 'Please fill the following paths with the correct paths'
+            GridLayout:
+                id: game_path
+                cols: 2
+                rows: 1
+                size_hint_y: None
+                height: 30
+                Label:
+                    text: 'Game path'
+                    size_hint_x: 0.5
+                TextInput:
+                    id: game_path_textinput
+                    multiline: False
+            GridLayout:
+                id: quickbms_path
+                cols: 2
+                rows: 1
+                size_hint_y: None
+                height: 30
+                Label:
+                    text: 'QuickBMS path'
+                    size_hint_x: 0.5
+                TextInput:
+                    id: quickbms_path_textinput
+                    multiline: False
+        GridLayout:
+            cols: 2
+            rows: 1
+            size_hint_y: None
+            height: 50
+            Button:
+                text: 'OK'
+                on_release: root.confirm()
+            Button:
+                text: 'Cancel'
+                on_release: root.cancel()
+
+GridLayout:
+    cols: 2
+    rows: 1
+    GridLayout:
+        cols: 1
+        rows: 3
+        size_hint_x: 0.5
+        Label:
+            text: "Log"
+            size_hint_y: 0.1
+        ScrollView:
+            id: log_scrollview
+            do_scroll_y: True
+            Label:
+                id: log_label
+                wrap: True
+                text_size: self.width, None
+        Button:
+            id: start_button
+            text: 'Start'
+            size_hint_y: 0.1
+            on_press: app.start()
+
+    GridLayout:
+        cols: 1
+        rows: 2
+        GridLayout:
+            cols: 1
+            rows: 2
+            GridLayout:
+                cols: 1
+                rows: 2
+                Label:
+                    text: 'Current Texture'
+                    size_hint_y: 0.1
+                Image:
+                    id: preview_image
+        GridLayout:
+            cols: 1
+            rows: 2
+            size_hint_y: 0.1
+            GridLayout:
+                cols: 2
+                rows: 1
+                Label:
+                    id: status_label
+                    text: ""
+                Label:
+                    id: status_label_info
+                    text: ""
+            ProgressBar:
+                id: progress_bar
+                value: 0
+                max: 100
