@@ -6,6 +6,10 @@
 *.dds
 *.png
 
+# ignore progress.txt and options.txt
+progress.txt
+options.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -19,3 +19,46 @@ class options():
     quickbms_executable = ""
     available_dat_files = ["model.dat", "weapon.dat", "map.dat"]
     dat_files_chosen = []
+
+    def load_from_file(self, file_path):
+        with open(file_path, "r") as f:
+            self.chosen_upscale_method = f.readline().strip()
+            self.max_resolution = int(f.readline().strip())
+            self.waifu2x_vulkan_model_noise_level = int(f.readline().strip())
+            self.chosen_waifu2x_vulkan_model = int(f.readline().strip())
+            self.upscale_factor = int(f.readline().strip())
+            self.game_base_dir = f.readline().strip()
+            self.quickbms_executable = f.readline().strip()
+            self.dat_files_chosen = f.readline().strip().split(",")
+        
+    # save to file and overwrite existing file
+    def save_to_file(self, file_path):
+        with open(file_path, "w") as f:
+            f.write(self.chosen_upscale_method + "\n")
+            f.write(str(self.max_resolution) + "\n")
+            f.write(str(self.waifu2x_vulkan_model_noise_level) + "\n")
+            f.write(str(self.chosen_waifu2x_vulkan_model) + "\n")
+            f.write(str(self.upscale_factor) + "\n")
+            f.write(self.game_base_dir + "\n")
+            f.write(self.quickbms_executable + "\n")
+            f.write(",".join(self.dat_files_chosen) + "\n")
+            
+
+class tracked_progress():
+    file_id = 0
+    chosen_options = options()
+
+    def load_from_file(self, file_path):
+        with open(file_path, "r") as f:
+            self.file_id = int(f.readline())
+            self.chosen_options.load_from_file(f.readline().strip())
+    
+    # save to file and overwrite existing file
+    def save_to_file(self, file_path):
+        with open(file_path, "w") as f:
+            f.write(str(self.file_id) + "\n")
+            f.write("options.txt" + "\n")
+            self.chosen_options.save_to_file("options.txt")
+
+        
+    

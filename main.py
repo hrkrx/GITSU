@@ -10,6 +10,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.spinner import Spinner
 from kivy.clock import mainthread
 from kivy.uix.popup import Popup
+from kivy.uix.button import Button 
 from kivy.uix.label import Label
 from kivy.app import App
 try: import waifu2x_vulkan
@@ -258,6 +259,9 @@ class GITSUmainWindow(App):
     chosen_options = options()
     popup = None
     current_image = None
+    progress_file = tracked_progress()
+    resume = False
+    progress_popup = None
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -280,6 +284,44 @@ class GITSUmainWindow(App):
         self.root.ids.start_button.disabled = True
         self.progress = 0
         
+        # check if there is a progress.txt file
+        if os.path.exists("progress.txt"):
+
+            # show popup to ask if the user wants to resume the upscaling
+            resume_grid = GridLayout(rows=2, cols=1)
+            resume_grid.add_widget(Label(text="Resume the upscaling?"))
+            button_grid = GridLayout(rows=1, cols=2)
+            resume_button = Button(text="Resume")
+            resume_button.bind(on_press=self.resume_upscaling)
+            cancel_button = Button(text="Cancel")
+            cancel_button.bind(on_press=self.cancel_upscaling)
+            button_grid.add_widget(resume_button)
+            button_grid.add_widget(cancel_button)
+            resume_grid.add_widget(button_grid)
+
+            resume_popup = Popup(title="Resume upscaling", content=resume_grid, size_hint=(0.25, 0.5))
+            self.progress_popup = resume_popup
+            
+            resume_popup.open()
+        else:
+            #show settings popup and retrieve options
+            self.popup = SettingsPopup()
+            self.popup.bind(on_dismiss=self.settings_popup_callback)
+            self.popup.open()
+
+    def resume_upscaling(self, button):
+        self.progress_popup.dismiss()
+        self.progress_file.load_from_file("progress.txt")
+        self.resume = True
+
+        # set the options from the progress.txt file
+        self.chosen_options = self.progress_file.chosen_options
+        start_thread(self.update_progress)
+        start_thread(self.start_process)
+
+    def cancel_upscaling(self, button):
+        self.progress_popup.dismiss()
+
         #show settings popup and retrieve options
         self.popup = SettingsPopup()
         self.popup.bind(on_dismiss=self.settings_popup_callback)
@@ -292,6 +334,7 @@ class GITSUmainWindow(App):
             self.root.ids.start_button.disabled = False
             log.info("Main: Upscaling cancelled")
         else:
+            self.progress_file.chosen_options = self.chosen_options
             start_thread(self.update_progress)
             start_thread(self.start_process)
 
@@ -364,33 +407,34 @@ class GITSUmainWindow(App):
             quickbms_available = True
             log.info("Main: quickbms is available")
         
+        if not self.resume:
 
-        # if quickbms is not available, use unpacker.py which is way slower
-        # unpack all the dat files
-        if not quickbms_available:
-            for dat_file in dat_files:
-                # check if there is no .dat.bak in the game directory
-                if os.path.exists(game_base_path + data_path + dat_file + ".bak"):
-                    # if there is a .dat.bak it was already unpacked
-                    continue
+            # if quickbms is not available, use unpacker.py which is way slower
+            # unpack all the dat files
+            if not quickbms_available:
+                for dat_file in dat_files:
+                    # check if there is no .dat.bak in the game directory
+                    if os.path.exists(game_base_path + data_path + dat_file + ".bak"):
+                        # if there is a .dat.bak it was already unpacked
+                        continue
 
-                log.info(f"Main: Unpacking {dat_file}")
-                self.progress_info = f"Unpacking {dat_file}"
-                unpack_file(game_base_path + data_path + dat_file, game_base_path + data_path)
-                self.progress += 1
-        else:
-            # unpack all the dat files with quickbms and subprocess
-            for dat_file in dat_files:
-                # check if there is no .dat.bak in the game directory
-                if os.path.exists(game_base_path + data_path + dat_file + ".bak"):
-                    # if there is a .dat.bak it was already unpacked
-                    log.info(f"Main: {dat_file} was already unpacked")
-                    continue
+                    log.info(f"Main: Unpacking {dat_file}")
+                    self.progress_info = f"Unpacking {dat_file}"
+                    unpack_file(game_base_path + data_path + dat_file, game_base_path + data_path)
+                    self.progress += 1
+            else:
+                # unpack all the dat files with quickbms and subprocess
+                for dat_file in dat_files:
+                    # check if there is no .dat.bak in the game directory
+                    if os.path.exists(game_base_path + data_path + dat_file + ".bak"):
+                        # if there is a .dat.bak it was already unpacked
+                        log.info(f"Main: {dat_file} was already unpacked")
+                        continue
 
-                log.info(f"Main: Unpacking {dat_file}")
-                self.progress_info = f"Unpacking {dat_file}"
-                subprocess.run([quickbms_executable, "-o", "GSFA.bms", game_base_path + data_path + dat_file, game_base_path + data_path])
-                self.progress += 1
+                    log.info(f"Main: Unpacking {dat_file}")
+                    self.progress_info = f"Unpacking {dat_file}"
+                    subprocess.run([quickbms_executable, "-o", "GSFA.bms", game_base_path + data_path + dat_file, game_base_path + data_path])
+                    self.progress += 1
 
         # collect all the dds files
         for dat_file in dat_files:
@@ -449,6 +493,17 @@ class GITSUmainWindow(App):
         # upscale all the dds files
         for dds_file in dds_files:
             try:
+                # skip if file is already upscaled and resume is enabled
+                if self.resume and self.progress_file.file_id > dds_files.index(dds_file):
+                    log.info(f"Main: Skipping {dds_file} with id {dds_files.index(dds_file)}")
+                    self.progress += 1
+                    continue
+
+                # set progress_file attributes
+                self.progress_file.file_id = dds_files.index(dds_file)
+
+                # write progress to file
+                self.progress_file.save_to_file("progress.txt")
 
                 dds_filename = os.path.basename(dds_file)
 
@@ -579,6 +634,19 @@ class GITSUmainWindow(App):
             # check if file exists
             if os.path.exists(dat_file):
                 os.rename(dat_file, dat_file + ".bak")
+
+        # delete progress.txt and options.txt
+        if os.path.exists("progress.txt"):
+            os.unlink("progress.txt")
+        if os.path.exists("options.txt"):
+            os.unlink("options.txt")
+
+        # show success popup
+        log.info(f"Main: Finished processing {len(dds_files)} dds files")
+        self.progress_info = f"Finished processing {len(dds_files)} dds files"
+        success_popup = Popup(title="Success", content=Label(text="Finished processing files"), size_hint=(0.25, 0.5), auto_dismiss=False)
+        success_popup.open()
+
 
 if __name__ == '__main__':
     mainWindow = GITSUmainWindow()
