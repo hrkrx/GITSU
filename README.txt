@@ -24,3 +24,9 @@ How to use
 9. Optionally enter the path to the quickbms executable, if you don't a python script will be used to extract the textures, which is way slower
 10. Click "OK"
 11. Wait for the upscaling to finish
+
+Additional notes
+================
+- The upscaler can resume if it crashes or you close it (since version 0.0.2)
+- The upscaler will create a backup of the original dat files named .dat.bak
+- The upscaler will use a temporary folder in the same directory as the upscaler
