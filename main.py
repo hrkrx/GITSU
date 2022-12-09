@@ -98,7 +98,7 @@ class SettingsPopup(Popup):
 
             elif method == "ESRGAN_4x":
                 # build the ESRGAN_4x method specific settings
-                warning_label = Label(text="Warning: ESRGAN_4x is extremly demanding on your GPU/CPU (16GB VRAM for GPU or 20GB RAM for CPU required), and will take a long time (up to 2 weeks) to upscale your images. It is recommended to use waifu2x_vulkan instead.")
+                warning_label = Label(text="Warning: ESRGAN_4x is extremly demanding on your GPU/CPU (16GB VRAM for GPU or 20GB RAM for CPU required), and will take a long time.")
                 warning_label.wrap = True
                 warning_label.size_hint_y = None
                 warning_label.text_size = (self.width - 25, None)
@@ -231,6 +231,7 @@ class SettingsPopup(Popup):
     def confirm(self):
         self.chosen_options.quickbms_executable = self.ids.quickbms_path_textinput.text
         self.chosen_options.game_base_dir = self.ids.game_path_textinput.text
+        self.chosen_options.max_resolution = int(self.ids.max_res_spinner.text)
 
         # check if base game directory exist
         if not os.path.exists(self.chosen_options.game_base_dir):
@@ -532,6 +533,18 @@ class GITSUmainWindow(App):
                 self.progress_info = f"Applying alpha mask to {dds_filename}"
                 apply_alphamask(temp_path + "noalpha_upscaled.png", temp_path +
                                 "\\alphamask_upscaled.png", temp_path + "upscaled.png")
+
+                # downscale the upscaled image if the resolution is too high
+                # check if image size is larger than options.max_resolution
+                image = Image.open(temp_path + "upscaled.png")
+                if image.size[0] > self.chosen_options.max_resolution or image.size[1] > self.chosen_options.max_resolution:
+                    image.close()
+                    log.info(f"Main: Downscaling {dds_filename}")
+                    self.progress_info = f"Downscaling {dds_filename}"
+                    downscale_image(temp_path + "upscaled.png", self.chosen_options.max_resolution)
+                else:
+                    image.close()
+
 
                 # create dds file from upscaled image
                 log.info(f"Main: Creating dds file from upscaled image")

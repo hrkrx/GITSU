@@ -68,15 +68,22 @@
                     on_release: root.set_weapon_dat()
                 Label:
                     text: 'Weapons'
-            
-            
-            
-            
         GridLayout:
             rows: 3
             cols: 1
-            Label:
-                text: 'Please fill the following paths with the correct paths'
+            GridLayout:
+                id: max_res
+                cols: 2
+                rows: 1
+                size_hint_y: None
+                height: 30
+                Label:
+                    text: 'Max resolution'
+                    size_hint_x: 0.5
+                Spinner:
+                    id: max_res_spinner
+                    text: "2048"
+                    values: ["2048", "4096", "8192"]
             GridLayout:
                 id: game_path
                 cols: 2

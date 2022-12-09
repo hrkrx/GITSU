@@ -97,6 +97,28 @@ def download_esrgan_model():
   """
   return hub.load(ESRGAN_MODEL_PATH)
 
+def downscale_image(image_path, maximum_size=2048):
+  """
+    Downscale an image.
+    Args:
+      image_path: Path to the image to be downscaled.
+      maximum_size: Maximum size of the image.
+  """
+  image = Image.open(image_path)
+  if image.size[0] > maximum_size:
+    # scale to 2048 and calculate new height
+    scale = maximum_size / image.size[0]
+    new_height = int(image.size[1] * scale)
+    image = image.resize((maximum_size, new_height), Image.ANTIALIAS)
+    image.save(image_path)
+
+  if image.size[1] > maximum_size:
+    # scale to 2048 and calculate new width
+    scale = maximum_size / image.size[1]
+    new_width = int(image.size[0] * scale)
+    image = image.resize((new_width, maximum_size), Image.ANTIALIAS)
+    image.save(image_path)
+
 def upscale_image(model, image_path, downscale_if_needed=True):
   """
     Upscales an image using the ESRGAN model.
@@ -107,20 +129,7 @@ def upscale_image(model, image_path, downscale_if_needed=True):
   if downscale_if_needed:
     # Downscale the image if it's too big.
     # The model only supports images up to 2048x2048.
-    image = Image.open(image_path)
-    if image.size[0] > 2048:
-      # scale to 2048 and calculate new height
-      scale = 2048 / image.size[0]
-      new_height = int(image.size[1] * scale)
-      image = image.resize((2048, new_height), Image.ANTIALIAS)
-      image.save(image_path)
-
-    if image.size[1] > 2048:
-      # scale to 2048 and calculate new width
-      scale = 2048 / image.size[1]
-      new_width = int(image.size[0] * scale)
-      image = image.resize((new_width, 2048), Image.ANTIALIAS)
-      image.save(image_path)
+    downscale_image(image_path, maximum_size=2048)
 
   hr_image = preprocess_image(image_path)
   sr_image = model(hr_image)

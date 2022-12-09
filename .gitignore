@@ -1,6 +1,11 @@
 # ignore zip files
 *.zip
 
+# ignore .jpg, .dds and .png files
+*.jpg
+*.dds
+*.png
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

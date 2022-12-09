@@ -5,6 +5,7 @@ class options():
     available_upscale_methods = ["waifu2x_vulkan", "ESRGAN_4x"]
     chosen_upscale_method = ""
     upscale_method = ""
+    max_resolution = 2048
     waifu2x_vulkan_model_noise_level_1 = [waifu2x_vulkan.MODEL_ANIME_STYLE_ART_RGB_NOISE1, waifu2x_vulkan.MODEL_CUNET_NOISE1, 
                                            waifu2x_vulkan.MODEL_CUNET_NO_SCALE_NOISE1, waifu2x_vulkan.MODEL_PHOTO_NOISE1]
     waifu2x_vulkan_model_noise_level_2 = [waifu2x_vulkan.MODEL_ANIME_STYLE_ART_RGB_NOISE2, waifu2x_vulkan.MODEL_CUNET_NOISE2,
