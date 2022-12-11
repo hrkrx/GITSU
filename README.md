@@ -11,7 +11,7 @@ but it does a decent job.
 
 How to use
 ==========
-1. Download the latest release from the releases page on github (If you read this you probably already did that)
+1. Download the latest release from the releases page on github (https://github.com/hrkrx/GITSU/releases)
 2. Ensure you have Python 3.9 or 3.10 installed (3.11 is not working yet)
 3. Install ImageMagick (https://imagemagick.org/script/download.php)
 4. Run the upscaler by double clicking the "start.bat" file
