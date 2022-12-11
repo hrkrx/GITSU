@@ -23,7 +23,7 @@ If you choose ESRGAN be sure you don't need your computer for anything else whil
 If you choose waifu2x you can choose the noise reduction level (1-3) and the scale factor (2, 3, 4) and the model (cunet, anime_style_art_rgb, photo)
 ```
 7. Choose the texture group you want to upscale (you can upscale multiple groups at once)
-8. Choose the max resolution of the final upscaled images (2048 -> performance | 4096 -> more details | 8192 -> max )
+8. Choose the max resolution of the final upscaled images (2048 -> performance | 4096 -> more details | 8192 -> max quality)
 9. Enter the path to the game's directory (the one that contains the "Data" folder)
 10. Optionally enter the path to the quickbms executable, if you don't a python script will be used to extract the textures, which is way slower (https://aluigi.altervista.org/quickbms.htm#:~:text=Compiled%20versions%20of%20QuickBMS%3A)
 11. Click "OK"
