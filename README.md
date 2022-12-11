@@ -1,5 +1,6 @@
 README for Gits: First Assault Online Upscaler v0.0.2
 =====================================================
+![Comparison](https://user-images.githubusercontent.com/5176531/206932845-f1a72f4d-1e27-4094-82a0-978de743ca8b.png)
 
 What is this?
 =============
