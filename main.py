@@ -386,6 +386,14 @@ class GITSUmainWindow(App):
         if os.path.exists("2.png"):
             os.remove("2.png")
 
+    @mainthread
+    def show_success_popup(self):
+        log.info(f"Main: Finished processing dds files")
+        self.progress_info = f"Finished processing dds files"
+        success_popup = Popup(title="Success", content=Label(text="Finished processing files"), size_hint=(0.25, 0.5), auto_dismiss=False)
+        success_popup.open()
+
+
     def unpack_and_upscale(self, game_base_path):
         self.upscaling_in_progress = True
         dat_files = self.chosen_options.dat_files_chosen
@@ -435,6 +443,13 @@ class GITSUmainWindow(App):
                     self.progress_info = f"Unpacking {dat_file}"
                     subprocess.run([quickbms_executable, "-o", "GSFA.bms", game_base_path + data_path + dat_file, game_base_path + data_path])
                     self.progress += 1
+
+            # rename orginal .dat files to .dat.bak
+            for dat_file in dat_files:
+                # check if file exists
+                if os.path.exists(dat_file):
+                    os.rename(dat_file, dat_file + ".bak")
+
 
         # collect all the dds files
         for dat_file in dat_files:
@@ -629,12 +644,6 @@ class GITSUmainWindow(App):
 
             self.progress += 1
         
-        # rename orginal .dat files to .dat.bak
-        for dat_file in dat_files:
-            # check if file exists
-            if os.path.exists(dat_file):
-                os.rename(dat_file, dat_file + ".bak")
-
         # delete progress.txt and options.txt
         if os.path.exists("progress.txt"):
             os.unlink("progress.txt")
@@ -642,11 +651,7 @@ class GITSUmainWindow(App):
             os.unlink("options.txt")
 
         # show success popup
-        log.info(f"Main: Finished processing {len(dds_files)} dds files")
-        self.progress_info = f"Finished processing {len(dds_files)} dds files"
-        success_popup = Popup(title="Success", content=Label(text="Finished processing files"), size_hint=(0.25, 0.5), auto_dismiss=False)
-        success_popup.open()
-
+        self.show_success_popup()
 
 if __name__ == '__main__':
     mainWindow = GITSUmainWindow()
